@@ -10,3 +10,6 @@
 [submodule "libs/whisper"]
 	path = libs/whisper
 	url = https://github.com/ggerganov/whisper.cpp.git
+[submodule "libs/rtaudio"]
+	path = libs/rtaudio
+	url = https://github.com/thestk/rtaudio.git
