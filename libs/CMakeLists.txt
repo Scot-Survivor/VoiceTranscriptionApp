@@ -36,3 +36,8 @@ file(GLOB WHISPER_H_FILES ${CMAKE_SOURCE_DIR}/libs/whisper/*.h)
 message("Whisper Files: ${WHISPER_H_FILES}")
 target_link_libraries(${PROJECT_NAME} whisper)
 include_directories(${WHISPER_H_FILES})
+
+# RT Audio
+set (RTAUDIO_TARGETNAME_UNINSTALL "rtaudio_uninstall" CACHE STRING "" FORCE)
+add_subdirectory(rtaudio)
+target_link_libraries(${PROJECT_NAME} rtaudio)
