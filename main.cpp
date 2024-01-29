@@ -15,6 +15,7 @@
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl2.h"
 #include "whisper.h"
+#include "RtAudio.h"
 #include <stdio.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -27,6 +28,19 @@ int main(int, char**)
     {
         printf("Error: %s\n", SDL_GetError());
         return -1;
+    }
+
+    RtAudio dac;
+    std::vector<unsigned int> deviceIds = dac.getDeviceIds();
+    if ( deviceIds.size() < 1 ) {
+        std::cout << "\nNo audio devices found!\n";
+        exit( 0 );
+    } else {
+        std::cout << "\nFound " << deviceIds.size() << " device(s) ...\n";
+        for ( unsigned int i=0; i<deviceIds.size(); i++ ) {
+            RtAudio::DeviceInfo info = dac.getDeviceInfo( deviceIds[i] );
+            std::cout << "Device " << i << ": " << info.name << '\n';
+        }
     }
 
     // From 2.0.18: Enable native IME.
