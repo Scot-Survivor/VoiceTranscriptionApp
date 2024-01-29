@@ -24,3 +24,10 @@ add_subdirectory(libs)
 target_compile_options(${PROJECT_NAME} PUBLIC $<TARGET_PROPERTY:MKL::MKL,INTERFACE_COMPILE_OPTIONS>)
 target_include_directories(${PROJECT_NAME} PUBLIC include $<TARGET_PROPERTY:MKL::MKL,INTERFACE_INCLUDE_DIRECTORIES>)
 target_link_libraries(${PROJECT_NAME} $<LINK_ONLY:MKL::MKL>)
+
+
+# Move rtaudiod.dll to the build directory
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_CURRENT_BINARY_DIR}/libs/rtaudio/rtaudiod.dll
+        ${CMAKE_CURRENT_BINARY_DIR}/rtaudiod.dll)
