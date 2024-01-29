@@ -25,3 +25,11 @@ target_include_directories(imgui PUBLIC
                             ${CMAKE_SOURCE_DIR}/libs/SDL/include
         )
 target_link_libraries(${PROJECT_NAME} imgui)
+
+set( BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE )
+set ( WHISPER_BUILD_TESTS OFF CACHE BOOL "" FORCE )
+set ( WHISPER_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE )
+set( WHISPER_SDL2 ON CACHE BOOL "" FORCE )
+set ( WHISPER_OPENVINO OFF CACHE BOOL "" FORCE )
+add_subdirectory(whisper)
+target_link_libraries(${PROJECT_NAME} ${TARGET})
