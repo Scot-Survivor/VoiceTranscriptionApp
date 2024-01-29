@@ -25,16 +25,25 @@ target_include_directories(imgui PUBLIC
                             ${CMAKE_SOURCE_DIR}/libs/SDL/include
         )
 target_link_libraries(${PROJECT_NAME} imgui)
-
+find_package(OpenVINO)
 set( BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE )
 set ( WHISPER_BUILD_TESTS OFF CACHE BOOL "" FORCE )
 set ( WHISPER_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE )
 set( WHISPER_SDL2 ON CACHE BOOL "" FORCE )
-set ( WHISPER_OPENVINO OFF CACHE BOOL "" FORCE )
+if (OpenVINO_FOUND)
+    set ( WHISPER_OPENVINO ON CACHE BOOL "" FORCE )
+    message("OpenVINO Found, Using Whisper OpenVINO")
+    set(WHISPER_TARGET "whisper whisper.openvino")
+else()
+    set ( WHISPER_OPENVINO OFF CACHE BOOL "" FORCE )
+    set(WHISPER_TARGET "whisper")
+endif()
 add_subdirectory(whisper)
 file(GLOB WHISPER_H_FILES ${CMAKE_SOURCE_DIR}/libs/whisper/*.h)
 message("Whisper Files: ${WHISPER_H_FILES}")
-target_link_libraries(${PROJECT_NAME} whisper)
+
+target_link_libraries(${PROJECT_NAME} ${WHISPER_TARGET})
+
 include_directories(${WHISPER_H_FILES})
 
 # RT Audio
