@@ -4,16 +4,16 @@
 
 #ifndef VOICETRANSCRIPTIONAPP_AUDIOPROCESSINGDEVICE_H
 #define VOICETRANSCRIPTIONAPP_AUDIOPROCESSINGDEVICE_H
-
+#include <vector>
 struct AudioDeviceSettings {
-    int deviceId;
+    unsigned int deviceId;
 };
 
 class AudioProcessingDevice {
 private:
-    AudioDeviceSettings m_audioDeviceSettings;
+    AudioDeviceSettings m_audioDeviceSettings{};
 public:
-    AudioProcessingDevice() = default;
+    AudioProcessingDevice(const std::vector<unsigned int>& deviceIds, unsigned int deviceId);
     ~AudioProcessingDevice() = default;
 
     void setDeviceId(int deviceId) {
@@ -23,6 +23,8 @@ public:
     AudioDeviceSettings* getAudioDeviceSettings() {
         return &m_audioDeviceSettings;
     }
+
+    static unsigned int find_device_idx_by_id(const std::vector<unsigned int>& deviceIds, unsigned int deviceId);
 };
 
 
