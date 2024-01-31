@@ -15,8 +15,8 @@ add_link_options(-fsycl -fsycl-unnamed-lambda  -mavx)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(${PROJECT_NAME} main.cpp
-        src/AudioProcessing.cpp
-        src/AudioProcessing.h)
+        src/AudioProcessingDevice.cpp
+        src/AudioProcessingDevice.h)
 
 # Add third party libraries.
 add_subdirectory(libs)
