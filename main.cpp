@@ -15,7 +15,7 @@
 #include "imgui_impl_sdl2.h"
 #include "imgui_impl_opengl2.h"
 #include "RtAudio.h"
-#include "libs/whisper/whisper.h"
+#include "whisper.h"
 #include <cstdio>
 #include <SDL.h>
 #include <SDL_opengl.h>
