@@ -4,6 +4,24 @@
 
 #include "AudioProcessingDevice.h"
 
+int record( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
+            double streamTime, RtAudioStreamStatus status, void *userData )
+{
+    if ( status )
+        std::cout << "Stream overflow detected!" << std::endl;
+
+    // Do something with the data in the "inputBuffer" buffer.
+    if ( inputBuffer ) {
+        std::cout << "Stream time: " << streamTime << std::endl;
+        // memcpy( userData, inputBuffer, 256 * sizeof( short ) );
+        auto temp = (float*)inputBuffer;
+        for (int i = 0; i < 256; i++) {
+            std::cout << temp[i] << ", ";
+        }
+    }
+    return 0;
+}
+
 unsigned int AudioProcessingDevice::find_device_idx_by_id(const std::vector<unsigned int>& deviceIds, unsigned int deviceId) {
     for (unsigned int i = 0; i < deviceIds.size(); i++) {
         if (deviceIds[i] == deviceId) {
@@ -38,6 +56,40 @@ unsigned int AudioProcessingDevice::find_device_idx_by_name(const std::string &d
         RtAudio::DeviceInfo info = m_dac->getDeviceInfo(m_deviceIds[i]);
         if (info.name == deviceName) {
             return i;
+        }
+    }
+    return -1;
+}
+
+void AudioProcessingDevice::start_stream() {
+    if ( m_dac->isStreamOpen() ) return;
+
+    RtAudio::DeviceInfo info = m_dac->getDeviceInfo(m_audioDeviceSettings.deviceId);
+    RtAudio::StreamParameters parameters;
+    parameters.deviceId = m_audioDeviceSettings.deviceId;
+    parameters.nChannels = info.inputChannels;
+    parameters.firstChannel = 0;
+    unsigned int sampleRate = info.preferredSampleRate;
+    unsigned int bufferFrames = 256; // 256 sample frames
+
+    if ( m_dac->openStream( nullptr, &parameters, RTAUDIO_FLOAT32,
+                         sampleRate, &bufferFrames, &record ) ) {
+        std::cout << '\n' <<  m_dac->getErrorText() << '\n' << std::endl;
+        exit( 0 ); // problem with device settings
+    }
+
+    // Stream is open ... now start it.
+    if ( m_dac->startStream() ) {
+        std::cout << m_dac->getErrorText() << std::endl;
+        if ( m_dac->isStreamOpen() ) m_dac->closeStream();
+    }
+}
+
+unsigned int AudioProcessingDevice::find_device_id_by_name(const std::string &deviceName) {
+    for (unsigned int m_deviceId : m_deviceIds) {
+        RtAudio::DeviceInfo info = m_dac->getDeviceInfo(m_deviceId);
+        if (info.name == deviceName) {
+            return m_deviceId;
         }
     }
     return -1;

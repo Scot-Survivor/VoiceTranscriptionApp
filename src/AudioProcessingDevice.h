@@ -6,6 +6,7 @@
 #define VOICETRANSCRIPTIONAPP_AUDIOPROCESSINGDEVICE_H
 #include <vector>
 #include <string>
+#include <thread>
 #include "RtAudio.h"
 
 struct AudioDeviceSettings {
@@ -17,6 +18,7 @@ private:
     AudioDeviceSettings m_audioDeviceSettings{};
     RtAudio* m_dac;
     std::vector<unsigned int> m_deviceIds;
+
 public:
     AudioProcessingDevice(RtAudio* dac, unsigned int deviceId);
     ~AudioProcessingDevice() = default;
@@ -31,8 +33,11 @@ public:
 
     static unsigned int find_device_idx_by_id(const std::vector<unsigned int>& deviceIds, unsigned int deviceId);
     unsigned int find_device_idx_by_name(const std::string& deviceName);
+    unsigned int find_device_id_by_name(const std::string& deviceName);
     std::vector<std::string> get_device_names();
     std::vector<unsigned int> get_device_ids();
+
+    void start_stream();
 };
 
 

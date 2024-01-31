@@ -23,6 +23,7 @@
 
 struct ProgramSettings {
     bool demo_window = false;
+    bool start_stream = false;
     AudioProcessingDevice* inputDevice = nullptr;
     AudioProcessingDevice* outputDevice = nullptr;
 };
@@ -34,11 +35,14 @@ void make_main_menu_bar(ProgramSettings *program_settings) {
             // Drop down of device names for inputDevice
             if (ImGui::BeginMenu("Input Device")) {
                 std::vector<std::string> deviceNames = program_settings->inputDevice->get_device_names();
-                for (unsigned int i = 0; i < deviceNames.size(); i++) {
-                    if (ImGui::MenuItem(deviceNames[i].c_str(), nullptr, program_settings->inputDevice->getAudioDeviceSettings()->deviceId == i, true)) {
-                        program_settings->inputDevice->setDeviceId(
-                                program_settings->inputDevice->find_device_idx_by_name(deviceNames[i])
-                                );
+                for (const auto & deviceName : deviceNames) {
+                    unsigned int id = program_settings->inputDevice->find_device_id_by_name(deviceName);
+                    if (id == -1) {
+                        std::cout << "Device not found" << std::endl;
+                        exit(0);
+                    }
+                    if (ImGui::MenuItem(deviceName.c_str(), nullptr, program_settings->inputDevice->getAudioDeviceSettings()->deviceId == id, true)) {
+                        program_settings->inputDevice->setDeviceId(id);
                     }
                 }
                 ImGui::EndMenu();
@@ -46,11 +50,14 @@ void make_main_menu_bar(ProgramSettings *program_settings) {
             // Drop down of device names for outputDevice
             if (ImGui::BeginMenu("Output Device")) {
                 std::vector<std::string> deviceNames = program_settings->outputDevice->get_device_names();
-                for (unsigned int i = 0; i < deviceNames.size(); i++) {
-                    if (ImGui::MenuItem(deviceNames[i].c_str(), nullptr, program_settings->outputDevice->getAudioDeviceSettings()->deviceId == i, true)) {
-                        program_settings->outputDevice->setDeviceId(
-                                program_settings->outputDevice->find_device_idx_by_name(deviceNames[i])
-                                );
+                for (const auto & deviceName : deviceNames) {
+                    unsigned int id = program_settings->outputDevice->find_device_id_by_name(deviceName);
+                    if (id == -1) {
+                        std::cout << "Device not found" << std::endl;
+                        exit(0);
+                    }
+                    if (ImGui::MenuItem(deviceName.c_str(), nullptr, program_settings->outputDevice->getAudioDeviceSettings()->deviceId == id, true)) {
+                        program_settings->outputDevice->setDeviceId(id);
                     }
                 }
                 ImGui::EndMenu();
@@ -61,6 +68,9 @@ void make_main_menu_bar(ProgramSettings *program_settings) {
             // Button to open debug window
             if (ImGui::MenuItem("Debug Window", nullptr, program_settings->demo_window, true)) {
                 program_settings->demo_window = true;
+            }
+            if (ImGui::MenuItem("Start Stream", nullptr, program_settings->start_stream, true)) {
+                program_settings->start_stream = true;
             }
             ImGui::EndMenu();
         }
@@ -88,7 +98,7 @@ int main(int, char**)
         std::cout << "\nFound " << deviceIds.size() << " device(s) ...\n";
         for ( unsigned int i=0; i<deviceIds.size(); i++ ) {
             RtAudio::DeviceInfo info = dac.getDeviceInfo( deviceIds[i] );
-            std::cout << "Device " << i << ": " << info.name << '\n';
+            std::cout << "Device " << info.ID << ": " << info.name << '\n';
         }
     }
 
@@ -158,11 +168,16 @@ int main(int, char**)
     whisper_full_params params = {};
     params.n_threads = 4;
 
+    bool streaming = false;
 
     // Main loop
     bool done = false;
     while (!done)
     {
+        if (!streaming & program_settings.start_stream) {
+            inputAudioDevice.start_stream();
+            streaming = true;
+        }
         // Poll and handle events (inputs, window resize, etc.)
         // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
         // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
