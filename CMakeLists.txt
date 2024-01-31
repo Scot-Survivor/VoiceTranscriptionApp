@@ -24,7 +24,7 @@ add_subdirectory(libs)
 # target_include_directories(${PROJECT_NAME} PUBLIC include)
 #target_link_libraries(${PROJECT_NAME} Test)
 target_compile_options(${PROJECT_NAME} PUBLIC $<TARGET_PROPERTY:MKL::MKL,INTERFACE_COMPILE_OPTIONS>)
-target_include_directories(${PROJECT_NAME} PUBLIC include $<TARGET_PROPERTY:MKL::MKL,INTERFACE_INCLUDE_DIRECTORIES>)
+target_include_directories(${PROJECT_NAME} PUBLIC src $<TARGET_PROPERTY:MKL::MKL,INTERFACE_INCLUDE_DIRECTORIES>)
 target_link_libraries(${PROJECT_NAME} $<LINK_ONLY:MKL::MKL>)
 
 
