@@ -20,6 +20,25 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
+struct ProgramSettings {
+    bool demo_window = false;
+};
+
+
+void make_main_menu_bar(ProgramSettings *program_settings) {
+    if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("Settings")) {
+            // Button to open debug window
+            if (ImGui::MenuItem("Debug Window", nullptr, program_settings->demo_window, true)) {
+                program_settings->demo_window = true;
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+}
+
+
 // Main code
 int main(int, char**)
 {
@@ -97,8 +116,7 @@ int main(int, char**)
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != nullptr);
 
-    // Our state
-    bool show_demo_window = false;
+    ProgramSettings program_settings = {};
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     whisper_full_params params = {};
@@ -128,10 +146,27 @@ int main(int, char**)
         ImGui_ImplOpenGL2_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
+        // Work out main menu bar size
+        ImGuiStyle &style = ImGui::GetStyle();
+        ImVec2 menu_bar_size = ImVec2(ImGui::GetIO().DisplaySize.x, style.FramePadding.y * 2 + ImGui::GetFontSize());
 
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        if (show_demo_window)
-            ImGui::ShowDemoWindow(&show_demo_window);
+
+        // ImGui::SetNextWindowPos(ImVec2(0, 0));
+        // ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+        // Render next window below
+        ImGui::SetNextWindowPos(ImVec2(0, menu_bar_size.y));
+        ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y - menu_bar_size.y));
+        ImGui::Begin("RegexTool", nullptr,  ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar
+        | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollbar);
+
+        make_main_menu_bar(&program_settings);
+
+
+        if (program_settings.demo_window) {
+            ImGui::ShowDemoWindow(&program_settings.demo_window);
+        }
+
+        ImGui::End();
 
         // Rendering
         ImGui::Render();
