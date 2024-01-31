@@ -16,17 +16,47 @@
 #include "imgui_impl_opengl2.h"
 #include "RtAudio.h"
 #include "whisper.h"
+#include "AudioProcessingDevice.h"
 #include <cstdio>
 #include <SDL.h>
 #include <SDL_opengl.h>
 
 struct ProgramSettings {
     bool demo_window = false;
+    AudioProcessingDevice* inputDevice = nullptr;
+    AudioProcessingDevice* outputDevice = nullptr;
 };
 
 
 void make_main_menu_bar(ProgramSettings *program_settings) {
     if (ImGui::BeginMainMenuBar()) {
+        if (ImGui::BeginMenu("Devices")) {
+            // Drop down of device names for inputDevice
+            if (ImGui::BeginMenu("Input Device")) {
+                std::vector<std::string> deviceNames = program_settings->inputDevice->get_device_names();
+                for (unsigned int i = 0; i < deviceNames.size(); i++) {
+                    if (ImGui::MenuItem(deviceNames[i].c_str(), nullptr, program_settings->inputDevice->getAudioDeviceSettings()->deviceId == i, true)) {
+                        program_settings->inputDevice->setDeviceId(
+                                program_settings->inputDevice->find_device_idx_by_name(deviceNames[i])
+                                );
+                    }
+                }
+                ImGui::EndMenu();
+            }
+            // Drop down of device names for outputDevice
+            if (ImGui::BeginMenu("Output Device")) {
+                std::vector<std::string> deviceNames = program_settings->outputDevice->get_device_names();
+                for (unsigned int i = 0; i < deviceNames.size(); i++) {
+                    if (ImGui::MenuItem(deviceNames[i].c_str(), nullptr, program_settings->outputDevice->getAudioDeviceSettings()->deviceId == i, true)) {
+                        program_settings->outputDevice->setDeviceId(
+                                program_settings->outputDevice->find_device_idx_by_name(deviceNames[i])
+                                );
+                    }
+                }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenu();
+        }
         if (ImGui::BeginMenu("Settings")) {
             // Button to open debug window
             if (ImGui::MenuItem("Debug Window", nullptr, program_settings->demo_window, true)) {
@@ -116,7 +146,13 @@ int main(int, char**)
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != nullptr);
 
-    ProgramSettings program_settings = {};
+    AudioProcessingDevice inputAudioDevice = AudioProcessingDevice(&dac, dac.getDefaultInputDevice());
+    AudioProcessingDevice outputAudioDevice = AudioProcessingDevice(&dac, dac.getDefaultOutputDevice());
+    ProgramSettings program_settings = {
+        .inputDevice = &inputAudioDevice,
+        .outputDevice = &outputAudioDevice
+    };
+
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     whisper_full_params params = {};
