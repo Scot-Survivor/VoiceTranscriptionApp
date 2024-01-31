@@ -33,7 +33,7 @@ set( WHISPER_SDL2 ON CACHE BOOL "" FORCE )
 if (OpenVINO_FOUND)
     set ( WHISPER_OPENVINO ON CACHE BOOL "" FORCE )
     message("OpenVINO Found, Using Whisper OpenVINO")
-    set(WHISPER_TARGET "whisper whisper.openvino")
+    set(WHISPER_TARGET "whisper")
     file(GLOB WHISPER_H_FILES ${CMAKE_SOURCE_DIR}/libs/whisper/*.h ${CMAKE_SOURCE_DIR}/libs/whisper/openvino/*.h)
 else()
     set ( WHISPER_OPENVINO OFF CACHE BOOL "" FORCE )
@@ -47,6 +47,7 @@ message("Whisper Files: ${WHISPER_H_FILES}")
 target_link_libraries(${PROJECT_NAME} ${WHISPER_TARGET})
 
 include_directories(${WHISPER_H_FILES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/libs/whisper)
 
 # RT Audio
 set (RTAUDIO_TARGETNAME_UNINSTALL "rtaudio_uninstall" CACHE STRING "" FORCE)
