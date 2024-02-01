@@ -102,7 +102,7 @@ unsigned int AudioProcessingDevice::find_device_id_by_name(const std::string &de
     return -1;
 }
 
-std::vector<float *> AudioProcessingDevice::get_audio_frames() {
+std::vector<float *> AudioProcessingDevice::pop_audio_frames() {
     std::vector<float *> audioFrames;
     std::optional<AudioFrame> frame = m_audioFrameQueue.pop();
     while (frame.has_value()) {
@@ -112,7 +112,7 @@ std::vector<float *> AudioProcessingDevice::get_audio_frames() {
     return audioFrames;
 }
 
-std::vector<float *> AudioProcessingDevice::get_audio_frames(double min, double max) {
+std::vector<float *> AudioProcessingDevice::pop_audio_frames(double min, double max) {
     std::vector<float *> audioFrames;
     std::optional<AudioFrame> frame = m_audioFrameQueue.pop();
     while (frame.has_value()) {

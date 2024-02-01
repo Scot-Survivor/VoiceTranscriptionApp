@@ -46,8 +46,8 @@ public:
 
     void start_stream();
 
-    std::vector<float *> get_audio_frames();
-    std::vector<float *> get_audio_frames(double min, double max);
+    std::vector<float *> pop_audio_frames();
+    std::vector<float *> pop_audio_frames(double min, double max);
 };
 
 
