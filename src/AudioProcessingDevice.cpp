@@ -7,16 +7,23 @@
 int record( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
             double streamTime, RtAudioStreamStatus status, void *userData )
 {
-    if ( status )
+    if ( status ) {
         std::cout << "Stream overflow detected!" << std::endl;
+    }
+    else {
+        auto audioFrameQueue = (SafeQueue<AudioFrame>*)userData;
 
-    // Do something with the data in the "inputBuffer" buffer.
-    if ( inputBuffer ) {
-        std::cout << "Stream time: " << streamTime << std::endl;
-        // memcpy( userData, inputBuffer, 256 * sizeof( short ) );
-        auto temp = (float*)inputBuffer;
-        for (int i = 0; i < 256; i++) {
-            std::cout << temp[i] << ", ";
+        // Do something with the data in the "inputBuffer" buffer.
+        if ( inputBuffer ) {
+            std::cout << "Stream time: " << streamTime << std::endl;
+            // memcpy( userData, inputBuffer, 256 * sizeof( short ) );
+            // auto temp = (float*)inputBuffer;
+            AudioFrame audioFrame = {};
+            //std::copy(temp, temp + nBufferFrames, audioFrame.data);
+            audioFrame.data = (float*)inputBuffer;
+            audioFrame.size = nBufferFrames;
+            audioFrame.streamTime = streamTime;
+            audioFrameQueue->push(audioFrame);
         }
     }
     return 0;
@@ -73,7 +80,7 @@ void AudioProcessingDevice::start_stream() {
     unsigned int bufferFrames = 256; // 256 sample frames
 
     if ( m_dac->openStream( nullptr, &parameters, RTAUDIO_FLOAT32,
-                         sampleRate, &bufferFrames, &record ) ) {
+                         sampleRate, &bufferFrames, &record, &m_audioFrameQueue ) ) {
         std::cout << '\n' <<  m_dac->getErrorText() << '\n' << std::endl;
         exit( 0 ); // problem with device settings
     }
@@ -93,4 +100,26 @@ unsigned int AudioProcessingDevice::find_device_id_by_name(const std::string &de
         }
     }
     return -1;
+}
+
+std::vector<float *> AudioProcessingDevice::get_audio_frames() {
+    std::vector<float *> audioFrames;
+    std::optional<AudioFrame> frame = m_audioFrameQueue.pop();
+    while (frame.has_value()) {
+        audioFrames.push_back(frame.value().data);
+        frame = m_audioFrameQueue.pop();
+    }
+    return audioFrames;
+}
+
+std::vector<float *> AudioProcessingDevice::get_audio_frames(double min, double max) {
+    std::vector<float *> audioFrames;
+    std::optional<AudioFrame> frame = m_audioFrameQueue.pop();
+    while (frame.has_value()) {
+        if (frame.value().streamTime >= min && frame.value().streamTime <= max) {
+            audioFrames.push_back(frame.value().data);
+        }
+        frame = m_audioFrameQueue.pop();
+    }
+    return audioFrames;
 }

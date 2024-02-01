@@ -8,9 +8,16 @@
 #include <string>
 #include <thread>
 #include "RtAudio.h"
+#include "SafeQueue.h"
 
 struct AudioDeviceSettings {
     unsigned int deviceId;
+};
+
+struct AudioFrame {
+    float* data;
+    unsigned int size;
+    double streamTime;
 };
 
 class AudioProcessingDevice {
@@ -18,7 +25,7 @@ private:
     AudioDeviceSettings m_audioDeviceSettings{};
     RtAudio* m_dac;
     std::vector<unsigned int> m_deviceIds;
-
+    SafeQueue<AudioFrame> m_audioFrameQueue;
 public:
     AudioProcessingDevice(RtAudio* dac, unsigned int deviceId);
     ~AudioProcessingDevice() = default;
@@ -38,6 +45,9 @@ public:
     std::vector<unsigned int> get_device_ids();
 
     void start_stream();
+
+    std::vector<float *> get_audio_frames();
+    std::vector<float *> get_audio_frames(double min, double max);
 };
 
 
