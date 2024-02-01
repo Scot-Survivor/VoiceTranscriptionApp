@@ -36,6 +36,12 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         ${CMAKE_CURRENT_BINARY_DIR}/libs/rtaudio/rtaudiod.dll
         ${CMAKE_CURRENT_BINARY_DIR}/rtaudiod.dll)
 
+# Move whisper.dll
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_CURRENT_BINARY_DIR}/libs/whisper/whisperd.lib
+        ${CMAKE_CURRENT_BINARY_DIR}/whisperd.lib)
+
 # Download Models
 if (MSVC)
     set(SCRIPT_EXTENSION cmd)
