@@ -22,7 +22,7 @@ public:
     SafeQueue(const SafeQueue<T> &) = delete ;
     SafeQueue& operator=(const SafeQueue<T> &) = delete ;
 
-    SafeQueue(SafeQueue<T>&& other) {
+    SafeQueue(SafeQueue<T>&& other)  noexcept {
         std::lock_guard<std::mutex> lock(mutex_);
         queue_ = std::move(other.queue_);
     }
