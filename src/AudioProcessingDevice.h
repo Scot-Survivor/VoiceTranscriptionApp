@@ -28,6 +28,7 @@ private:
     SafeQueue<AudioFrame> m_audioFrameQueue;
 public:
     AudioProcessingDevice(RtAudio* dac, unsigned int deviceId);
+    AudioProcessingDevice(unsigned int deviceId);
     ~AudioProcessingDevice() = default;
 
     void setDeviceId(unsigned int deviceId) {

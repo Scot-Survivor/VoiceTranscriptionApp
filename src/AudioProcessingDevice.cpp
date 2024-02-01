@@ -42,7 +42,14 @@ AudioProcessingDevice::AudioProcessingDevice(RtAudio* dac, unsigned int deviceId
     m_dac = dac;
     m_deviceIds = m_dac->getDeviceIds();
     m_audioDeviceSettings = {};
-    m_audioDeviceSettings.deviceId = find_device_idx_by_id(m_deviceIds, deviceId);
+    m_audioDeviceSettings.deviceId =  deviceId;
+}
+
+AudioProcessingDevice::AudioProcessingDevice(unsigned int deviceId) {
+    m_dac = new RtAudio();
+    m_deviceIds = m_dac->getDeviceIds();
+    m_audioDeviceSettings = {};
+    m_audioDeviceSettings.deviceId = deviceId;
 }
 
 std::vector<std::string> AudioProcessingDevice::get_device_names() {
