@@ -35,3 +35,27 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${CMAKE_CURRENT_BINARY_DIR}/libs/rtaudio/rtaudiod.dll
         ${CMAKE_CURRENT_BINARY_DIR}/rtaudiod.dll)
+
+# Download Models
+if (MSVC)
+    set(SCRIPT_EXTENSION cmd)
+else ()
+    set(SCRIPT_EXTENSION sh)
+endif ()
+add_custom_target(download_models ALL
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libs/whisper/models/download-ggml-model.${SCRIPT_EXTENSION} base.en
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs/whisper
+        COMMENT "Downloading models"
+        VERBATIM)
+
+add_custom_target(create_model_dir ALL
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/models
+        COMMENT "Creating models directory"
+        VERBATIM)
+
+add_custom_target(copy_models ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/libs/whisper/models ${CMAKE_CURRENT_BINARY_DIR}/models
+        COMMENT "Copying models"
+        VERBATIM)
+add_dependencies(copy_models create_model_dir download_models)
+add_dependencies(${PROJECT_NAME} copy_models)
