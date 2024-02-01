@@ -16,7 +16,9 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(${PROJECT_NAME} main.cpp
         src/AudioProcessingDevice.cpp
-        src/AudioProcessingDevice.h)
+        src/AudioProcessingDevice.h
+        src/SafeQueue.cpp
+        src/SafeQueue.h)
 
 # Add third party libraries.
 add_subdirectory(libs)
