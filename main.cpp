@@ -156,8 +156,8 @@ int main(int, char**)
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != nullptr);
 
-    AudioProcessingDevice inputAudioDevice = AudioProcessingDevice(&dac, dac.getDefaultInputDevice());
-    AudioProcessingDevice outputAudioDevice = AudioProcessingDevice(&dac, dac.getDefaultOutputDevice());
+    AudioProcessingDevice inputAudioDevice = AudioProcessingDevice(dac.getDefaultInputDevice());
+    AudioProcessingDevice outputAudioDevice = AudioProcessingDevice(dac.getDefaultOutputDevice());
     ProgramSettings program_settings = {
         .inputDevice = &inputAudioDevice,
         .outputDevice = &outputAudioDevice
@@ -176,6 +176,7 @@ int main(int, char**)
     {
         if (!streaming & program_settings.start_stream) {
             inputAudioDevice.start_stream();
+            outputAudioDevice.start_stream();
             streaming = true;
         }
         // Poll and handle events (inputs, window resize, etc.)

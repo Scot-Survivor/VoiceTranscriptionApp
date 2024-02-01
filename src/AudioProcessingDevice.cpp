@@ -81,7 +81,7 @@ void AudioProcessingDevice::start_stream() {
     RtAudio::DeviceInfo info = m_dac->getDeviceInfo(m_audioDeviceSettings.deviceId);
     RtAudio::StreamParameters parameters;
     parameters.deviceId = m_audioDeviceSettings.deviceId;
-    parameters.nChannels = info.inputChannels;
+    parameters.nChannels = std::max(info.inputChannels, (unsigned int) 1);
     parameters.firstChannel = 0;
     unsigned int sampleRate = info.preferredSampleRate;
     unsigned int bufferFrames = 256; // 256 sample frames

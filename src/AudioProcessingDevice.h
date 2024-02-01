@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <thread>
+#include <cmath>
 #include "RtAudio.h"
 #include "SafeQueue.h"
 
