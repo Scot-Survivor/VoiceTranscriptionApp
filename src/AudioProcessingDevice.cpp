@@ -20,7 +20,7 @@ int record( void *outputBuffer, void *inputBuffer, unsigned int nBufferFrames,
             // auto temp = (float*)inputBuffer;
             AudioFrame audioFrame = {};
             //std::copy(temp, temp + nBufferFrames, audioFrame.data);
-            audioFrame.data = (float*)inputBuffer;
+            audioFrame.data = (int16_t *)inputBuffer;
             audioFrame.size = nBufferFrames;
             audioFrame.streamTime = streamTime;
             audioFrameQueue->push(audioFrame);
@@ -86,7 +86,7 @@ void AudioProcessingDevice::start_stream() {
     unsigned int sampleRate = info.preferredSampleRate;
     unsigned int bufferFrames = 256; // 256 sample frames
 
-    if ( m_dac->openStream( nullptr, &parameters, RTAUDIO_FLOAT32,
+    if ( m_dac->openStream( nullptr, &parameters, RTAUDIO_SINT16,
                          sampleRate, &bufferFrames, &record, &m_audioFrameQueue ) ) {
         std::cout << '\n' <<  m_dac->getErrorText() << '\n' << std::endl;
         exit( 0 ); // problem with device settings

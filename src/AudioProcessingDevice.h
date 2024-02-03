@@ -16,7 +16,7 @@ struct AudioDeviceSettings {
 };
 
 struct AudioFrame {
-    float* data;
+    int16_t* data;
     unsigned int size;
     double streamTime;
 };
